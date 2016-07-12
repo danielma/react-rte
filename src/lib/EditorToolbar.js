@@ -5,11 +5,7 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import {EditorState, Entity, RichUtils} from 'draft-js';
 import {ENTITY_TYPE} from 'draft-js-utils';
-import {
-  INLINE_STYLE_BUTTONS,
-  BLOCK_TYPE_DROPDOWN,
-  BLOCK_TYPE_BUTTONS,
-} from './EditorToolbarConfig';
+import config from './EditorToolbarConfig';
 import StyleButton from './StyleButton';
 import PopoverIconButton from '../ui/PopoverIconButton';
 import ButtonGroup from '../ui/ButtonGroup';
@@ -33,6 +29,7 @@ type Props = {
   keyEmitter: EventEmitter;
   onChange: ChangeHandler;
   focusEditor: Function;
+  config: Object;
 };
 
 type State = {
@@ -61,6 +58,14 @@ export default class EditorToolbar extends Component {
     this.props.keyEmitter.removeListener('keypress', this._onKeypress);
   }
 
+  getConfig(): Object {
+    if (this.props.config) {
+      return {...config, ...this.props.config};
+    } else {
+      return config;
+    }
+  }
+
   render(): React.Element {
     const {className} = this.props;
     return (
@@ -77,7 +82,7 @@ export default class EditorToolbar extends Component {
   _renderBlockTypeDropdown(): React.Element {
     let blockType = this._getCurrentBlockType();
     let choices = new Map(
-      BLOCK_TYPE_DROPDOWN.map((type) => [type.style, type.label])
+      this.getConfig().BLOCK_TYPE_DROPDOWN.map((type) => [type.style, type.label])
     );
     if (!choices.has(blockType)) {
       blockType = Array.from(choices.keys())[0];
@@ -95,7 +100,7 @@ export default class EditorToolbar extends Component {
 
   _renderBlockTypeButtons(): React.Element {
     let blockType = this._getCurrentBlockType();
-    let buttons = BLOCK_TYPE_BUTTONS.map((type, index) => (
+    let buttons = this.getConfig().BLOCK_TYPE_BUTTONS.map((type, index) => (
       <StyleButton
         key={String(index)}
         isActive={type.style === blockType}
@@ -112,7 +117,7 @@ export default class EditorToolbar extends Component {
   _renderInlineStyleButtons(): React.Element {
     let {editorState} = this.props;
     let currentStyle = editorState.getCurrentInlineStyle();
-    let buttons = INLINE_STYLE_BUTTONS.map((type, index) => (
+    let buttons = this.getConfig().INLINE_STYLE_BUTTONS.map((type, index) => (
       <StyleButton
         key={String(index)}
         isActive={currentStyle.has(type.style)}
@@ -154,26 +159,35 @@ export default class EditorToolbar extends Component {
     );
   }
 
-  _renderUndoRedo(): React.Element {
+  _renderUndoRedo(): ?React.Element {
+    const [undoEnabled, redoEnabled] = this.getConfig().UNDO_REDO_ENABLED;
+    if (!undoEnabled && !redoEnabled) {
+      return null;
+    }
+
     let {editorState} = this.props;
     let canUndo = editorState.getUndoStack().size !== 0;
     let canRedo = editorState.getRedoStack().size !== 0;
     return (
       <ButtonGroup>
-        <IconButton
-          label="Undo"
-          iconName="undo"
-          isDisabled={!canUndo}
-          onClick={this._undo}
-          focusOnClick={false}
-        />
-        <IconButton
-          label="Redo"
-          iconName="redo"
-          isDisabled={!canRedo}
-          onClick={this._redo}
-          focusOnClick={false}
-        />
+        {undoEnabled &&
+          <IconButton
+            label="Undo"
+            iconName="undo"
+            isDisabled={!canUndo}
+            onClick={this._undo}
+            focusOnClick={false}
+          />
+        }
+        {redoEnabled &&
+          <IconButton
+            label="Redo"
+            iconName="redo"
+            isDisabled={!canRedo}
+            onClick={this._redo}
+            focusOnClick={false}
+          />
+        }
       </ButtonGroup>
     );
   }

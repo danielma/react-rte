@@ -17,9 +17,11 @@ export const BLOCK_TYPE_BUTTONS = [
   {label: 'OL', style: 'ordered-list-item'},
   {label: 'Blockquote', style: 'blockquote'},
 ];
+export const UNDO_REDO_ENABLED = [false, false];
 
 export default {
   INLINE_STYLE_BUTTONS,
   BLOCK_TYPE_DROPDOWN,
   BLOCK_TYPE_BUTTONS,
+  UNDO_REDO_ENABLED,
 };
