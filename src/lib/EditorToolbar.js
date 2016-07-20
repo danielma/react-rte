@@ -87,7 +87,7 @@ export default class EditorToolbar extends Component {
     if (!choices.has(blockType)) {
       blockType = Array.from(choices.keys())[0];
     }
-    return (
+    return choices.size > 0 && (
       <ButtonGroup>
         <Dropdown
           choices={choices}
