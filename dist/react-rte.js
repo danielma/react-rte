@@ -19089,7 +19089,7 @@ module.exports =
 	      if (!choices.has(blockType)) {
 	        blockType = Array.from(choices.keys())[0];
 	      }
-	      return _react2.default.createElement(
+	      return choices.size > 0 && _react2.default.createElement(
 	        _ButtonGroup2.default,
 	        null,
 	        _react2.default.createElement(_Dropdown2.default, {
